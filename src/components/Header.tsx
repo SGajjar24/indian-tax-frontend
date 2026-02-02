@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Button, 
-  Box, 
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
   Container,
   useMediaQuery,
   IconButton,
@@ -19,7 +19,7 @@ import {
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import CalculateIcon from '@mui/icons-material/Calculate';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
+import CalculateIcon from '@mui/icons-material/Calculate';
 import SavingsIcon from '@mui/icons-material/Savings';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -30,21 +30,20 @@ const Header: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-  
+
   const navItems = [
     { name: 'Home', path: '/', icon: <HomeIcon /> },
     { name: 'Calculator', path: '/calculator', icon: <CalculateIcon /> },
-    { name: 'Upload', path: '/upload', icon: <UploadFileIcon /> },
     { name: 'Deductions', path: '/deductions', icon: <SavingsIcon /> },
     { name: 'Planning', path: '/planning', icon: <BarChartIcon /> },
     { name: 'Reports', path: '/reports', icon: <BarChartIcon /> },
     { name: 'Help', path: '/help', icon: <HelpOutlineIcon /> }
   ];
-  
+
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2, fontFamily: 'Poppins, sans-serif', fontWeight: 700 }}>
@@ -53,11 +52,11 @@ const Header: React.FC = () => {
       <Divider />
       <List>
         {navItems.map((item) => (
-          <ListItem 
-            key={item.name} 
-            component={RouterLink} 
+          <ListItem
+            key={item.name}
+            component={RouterLink}
             to={item.path}
-            sx={{ 
+            sx={{
               color: location.pathname === item.path ? 'primary.main' : 'text.primary',
               fontWeight: location.pathname === item.path ? 700 : 400,
               '&:hover': {
@@ -76,11 +75,11 @@ const Header: React.FC = () => {
   );
 
   return (
-    <AppBar 
-      position="sticky" 
-      color="default" 
+    <AppBar
+      position="sticky"
+      color="default"
       elevation={0}
-      sx={{ 
+      sx={{
         bgcolor: 'background.paper',
         borderBottom: '1px solid',
         borderColor: 'divider'
@@ -141,7 +140,7 @@ const Header: React.FC = () => {
                 key={item.name}
                 component={RouterLink}
                 to={item.path}
-                sx={{ 
+                sx={{
                   color: location.pathname === item.path ? 'primary.main' : 'text.primary',
                   fontWeight: location.pathname === item.path ? 700 : 500,
                   mx: 1,
@@ -157,7 +156,7 @@ const Header: React.FC = () => {
           </Box>
         </Toolbar>
       </Container>
-      
+
       <Drawer
         variant="temporary"
         open={mobileOpen}

@@ -50,6 +50,7 @@ export const calculateTotalIncome = (income: IncomeDetails): number => {
  */
 export const calculateTotalDeductions = (deductions: DeductionDetails): number => {
   return (
+    50000 + // Standard Deduction for Salaried Employees (Old Regime)
     Math.min(deductions.section80C, 150000) +
     Math.min(deductions.section80D, 50000) +
     deductions.hra +
@@ -85,18 +86,24 @@ export const calculateOldRegimeTax = (taxableIncome: number): number => {
 export const calculateNewRegimeTax = (taxableIncome: number): number => {
   let tax = 0;
 
+  // New Tax Slab FY 2024-25 (Final Budget)
   if (taxableIncome <= 300000) {
     tax = 0;
-  } else if (taxableIncome <= 600000) {
+  } else if (taxableIncome <= 700000) {
     tax = (taxableIncome - 300000) * 0.05;
-  } else if (taxableIncome <= 900000) {
-    tax = 15000 + (taxableIncome - 600000) * 0.1;
+  } else if (taxableIncome <= 1000000) {
+    tax = 20000 + (taxableIncome - 700000) * 0.1;
   } else if (taxableIncome <= 1200000) {
-    tax = 45000 + (taxableIncome - 900000) * 0.15;
+    tax = 50000 + (taxableIncome - 1000000) * 0.15;
   } else if (taxableIncome <= 1500000) {
-    tax = 90000 + (taxableIncome - 1200000) * 0.2;
+    tax = 80000 + (taxableIncome - 1200000) * 0.2;
   } else {
-    tax = 150000 + (taxableIncome - 1500000) * 0.3;
+    tax = 140000 + (taxableIncome - 1500000) * 0.3;
+  }
+
+  // Section 87A Rebate for New Regime: Up to 7 Lakhs (Income after Std Deduction)
+  if (taxableIncome <= 700000) {
+    tax = 0;
   }
 
   return tax;
@@ -129,17 +136,21 @@ export const calculateTaxLiability = (
   regime: 'old' | 'new'
 ): TaxResult => {
   const totalIncome = calculateTotalIncome(income);
-  const totalDeductions = regime === 'old' ? calculateTotalDeductions(deductions) : 0;
+
+  // Standard Deduction: ₹50,000 for Old Regime, ₹75,000 for New Regime (FY 24-25 Final)
+  const standardDeduction = regime === 'old' ? 50000 : 75000;
+
+  const totalDeductions = regime === 'old' ? calculateTotalDeductions(deductions) : standardDeduction;
   const taxableIncome = Math.max(totalIncome - totalDeductions, 0);
-  
+
   const incomeTax = regime === 'old'
     ? calculateOldRegimeTax(taxableIncome)
     : calculateNewRegimeTax(taxableIncome);
-  
+
   const surcharge = calculateSurcharge(incomeTax, taxableIncome);
   const cess = calculateCess(incomeTax, surcharge);
   const totalTaxLiability = incomeTax + surcharge + cess;
-  
+
   return {
     totalIncome,
     totalDeductions,
@@ -160,12 +171,12 @@ export const calculateTaxSavings = (
 ): { oldRegimeTax: number; newRegimeTax: number; savings: number; betterRegime: 'old' | 'new' } => {
   const oldRegimeResult = calculateTaxLiability(income, deductions, 'old');
   const newRegimeResult = calculateTaxLiability(income, deductions, 'new');
-  
+
   const oldRegimeTax = oldRegimeResult.totalTaxLiability;
   const newRegimeTax = newRegimeResult.totalTaxLiability;
   const savings = Math.abs(oldRegimeTax - newRegimeTax);
   const betterRegime = oldRegimeTax <= newRegimeTax ? 'old' : 'new';
-  
+
   return {
     oldRegimeTax,
     newRegimeTax,

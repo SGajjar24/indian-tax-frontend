@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Paper, 
-  Grid as MuiGrid, 
-  TextField, 
+import {
+  Box,
+  Container,
+  Typography,
+  Paper,
+  Grid as MuiGrid,
+  TextField,
   MenuItem,
   Button,
   Divider,
@@ -23,8 +23,8 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import InfoIcon from '@mui/icons-material/Info';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import TaxRegimeComparison from '../components/TaxRegimeComparison';
-import { 
-  calculateTaxLiability, 
+import {
+  calculateTaxLiability,
   calculateTaxSavings,
   IncomeDetails,
   DeductionDetails
@@ -76,7 +76,7 @@ const Grid = MuiGrid;
 const CalculatorPage: React.FC = () => {
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
-  
+
   // State for form inputs
   const [taxRegime, setTaxRegime] = useState<'old' | 'new'>('new');
   const [incomeSource, setIncomeSource] = useState('salary');
@@ -85,7 +85,7 @@ const CalculatorPage: React.FC = () => {
   const [capitalGains, setCapitalGains] = useState<number | ''>('');
   const [housePropertyIncome, setHousePropertyIncome] = useState<number | ''>('');
   const [otherIncome, setOtherIncome] = useState<number | ''>('');
-  
+
   // State for deductions (only applicable for old regime)
   const [section80C, setSection80C] = useState<number | ''>('');
   const [section80D, setSection80D] = useState<number | ''>('');
@@ -94,7 +94,7 @@ const CalculatorPage: React.FC = () => {
   const [nps, setNps] = useState<number | ''>('');
   const [homeLoanInterest, setHomeLoanInterest] = useState<number | ''>('');
   const [otherDeductions, setOtherDeductions] = useState<number | ''>('');
-  
+
   // State for calculation results
   const [taxResult, setTaxResult] = useState<{
     totalIncome: number;
@@ -105,7 +105,7 @@ const CalculatorPage: React.FC = () => {
     cess: number;
     totalTaxLiability: number;
   } | null>(null);
-  
+
   // State for regime comparison
   const [comparisonResult, setComparisonResult] = useState<{
     oldRegimeTax: number;
@@ -113,12 +113,12 @@ const CalculatorPage: React.FC = () => {
     savings: number;
     betterRegime: 'old' | 'new';
   } | null>(null);
-  
+
   // Helper function to convert string or empty to number
   const toNumber = (value: number | ''): number => {
     return typeof value === 'number' ? value : 0;
   };
-  
+
   // Prepare income details object
   const getIncomeDetails = (): IncomeDetails => {
     return {
@@ -129,7 +129,7 @@ const CalculatorPage: React.FC = () => {
       otherIncome: toNumber(otherIncome)
     };
   };
-  
+
   // Prepare deduction details object
   const getDeductionDetails = (): DeductionDetails => {
     return {
@@ -142,113 +142,113 @@ const CalculatorPage: React.FC = () => {
       otherDeductions: toNumber(otherDeductions)
     };
   };
-  
+
   // Handle tax calculation
   const handleCalculate = () => {
     const incomeDetails = getIncomeDetails();
     const deductionDetails = getDeductionDetails();
-    
+
     const result = calculateTaxLiability(incomeDetails, deductionDetails, taxRegime);
     setTaxResult(result);
-    
+
     // Also calculate comparison if we're on the comparison tab
     if (tabValue === 1) {
       handleCompare();
     }
   };
-  
+
   // Handle regime comparison
   const handleCompare = () => {
     const incomeDetails = getIncomeDetails();
     const deductionDetails = getDeductionDetails();
-    
+
     const comparison = calculateTaxSavings(incomeDetails, deductionDetails);
     setComparisonResult(comparison);
   };
-  
+
   // Handle save calculation
   const handleSave = () => {
     // This would be implemented with backend integration
     alert('Save functionality will be integrated with user accounts');
   };
-  
+
   // Handle tab change
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-    
+
     // If switching to comparison tab and we have tax results, calculate comparison
     if (newValue === 1 && taxResult) {
       handleCompare();
     }
   };
-  
+
   return (
     <Box sx={{ py: 4 }}>
       <Container maxWidth="lg">
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          fontWeight="bold" 
+        <Typography
+          variant="h3"
+          component="h1"
+          fontWeight="bold"
           fontFamily="Poppins, sans-serif"
           gutterBottom
           className="fade-in"
         >
           Tax Calculator
         </Typography>
-        <Typography 
-          variant="h6" 
-          color="text.secondary" 
+        <Typography
+          variant="h6"
+          color="text.secondary"
           gutterBottom
           sx={{ mb: 4 }}
         >
           Calculate your income tax liability for FY 2024-2025 (AY 2025-2026)
         </Typography>
-        
+
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange} 
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
             aria-label="tax calculator tabs"
             textColor="primary"
             indicatorColor="primary"
           >
-            <Tab 
-              label="Tax Calculator" 
-              icon={<CalculateIcon />} 
+            <Tab
+              label="Tax Calculator"
+              icon={<CalculateIcon />}
               iconPosition="start"
               sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}
             />
-            <Tab 
-              label="Regime Comparison" 
-              icon={<CompareArrowsIcon />} 
+            <Tab
+              label="Regime Comparison"
+              icon={<CompareArrowsIcon />}
               iconPosition="start"
               sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}
             />
           </Tabs>
         </Box>
-        
+
         <TabPanel value={tabValue} index={0}>
           <Grid container spacing={4}>
             {/* Form Section */}
             <Grid item xs={12} md={8}>
-              <Paper 
-                elevation={3} 
-                sx={{ 
-                  p: 3, 
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 3,
                   borderRadius: 2,
                   mb: 4
                 }}
               >
-                <Typography 
-                  variant="h5" 
-                  component="h2" 
+                <Typography
+                  variant="h5"
+                  component="h2"
                   fontWeight="600"
                   fontFamily="Poppins, sans-serif"
                   gutterBottom
                 >
                   Income Details
                 </Typography>
-                
+
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <TextField
@@ -267,7 +267,7 @@ const CalculatorPage: React.FC = () => {
                       ))}
                     </TextField>
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       select
@@ -284,11 +284,11 @@ const CalculatorPage: React.FC = () => {
                       ))}
                     </TextField>
                   </Grid>
-                  
+
                   <Grid item xs={12}>
                     <Divider sx={{ my: 1 }} />
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <TextField
@@ -307,7 +307,7 @@ const CalculatorPage: React.FC = () => {
                       </Tooltip>
                     </Box>
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <TextField
@@ -326,7 +326,7 @@ const CalculatorPage: React.FC = () => {
                       </Tooltip>
                     </Box>
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
@@ -338,7 +338,7 @@ const CalculatorPage: React.FC = () => {
                       margin="normal"
                     />
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
@@ -350,7 +350,7 @@ const CalculatorPage: React.FC = () => {
                       margin="normal"
                     />
                   </Grid>
-                  
+
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
@@ -364,27 +364,27 @@ const CalculatorPage: React.FC = () => {
                   </Grid>
                 </Grid>
               </Paper>
-              
+
               {/* Deductions Section - Only for Old Regime */}
               {taxRegime === 'old' && (
-                <Paper 
-                  elevation={3} 
-                  sx={{ 
-                    p: 3, 
+                <Paper
+                  elevation={3}
+                  sx={{
+                    p: 3,
                     borderRadius: 2,
                     mb: 4
                   }}
                 >
-                  <Typography 
-                    variant="h5" 
-                    component="h2" 
+                  <Typography
+                    variant="h5"
+                    component="h2"
                     fontWeight="600"
                     fontFamily="Poppins, sans-serif"
                     gutterBottom
                   >
                     Deductions & Exemptions
                   </Typography>
-                  
+
                   <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -404,7 +404,7 @@ const CalculatorPage: React.FC = () => {
                         </Tooltip>
                       </Box>
                     </Grid>
-                    
+
                     <Grid item xs={12} sm={6}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <TextField
@@ -423,7 +423,7 @@ const CalculatorPage: React.FC = () => {
                         </Tooltip>
                       </Box>
                     </Grid>
-                    
+
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
@@ -435,7 +435,7 @@ const CalculatorPage: React.FC = () => {
                         margin="normal"
                       />
                     </Grid>
-                    
+
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
@@ -447,7 +447,7 @@ const CalculatorPage: React.FC = () => {
                         margin="normal"
                       />
                     </Grid>
-                    
+
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
@@ -459,7 +459,7 @@ const CalculatorPage: React.FC = () => {
                         margin="normal"
                       />
                     </Grid>
-                    
+
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
@@ -471,7 +471,7 @@ const CalculatorPage: React.FC = () => {
                         margin="normal"
                       />
                     </Grid>
-                    
+
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
@@ -486,7 +486,7 @@ const CalculatorPage: React.FC = () => {
                   </Grid>
                 </Paper>
               )}
-              
+
               {/* Action Buttons */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
                 <Button
@@ -495,8 +495,8 @@ const CalculatorPage: React.FC = () => {
                   size="large"
                   startIcon={<CalculateIcon />}
                   onClick={handleCalculate}
-                  sx={{ 
-                    py: 1.5, 
+                  sx={{
+                    py: 1.5,
                     px: 4,
                     fontWeight: 600,
                     borderRadius: 2
@@ -504,15 +504,15 @@ const CalculatorPage: React.FC = () => {
                 >
                   Calculate Tax
                 </Button>
-                
+
                 <Button
                   variant="outlined"
                   color="primary"
                   size="large"
                   startIcon={<SaveAltIcon />}
                   onClick={handleSave}
-                  sx={{ 
-                    py: 1.5, 
+                  sx={{
+                    py: 1.5,
                     px: 4,
                     fontWeight: 600,
                     borderRadius: 2
@@ -522,28 +522,28 @@ const CalculatorPage: React.FC = () => {
                 </Button>
               </Box>
             </Grid>
-            
+
             {/* Results Section */}
             <Grid item xs={12} md={4}>
               <Box sx={{ position: 'sticky', top: 24 }}>
-                <Paper 
-                  elevation={3} 
-                  sx={{ 
-                    p: 3, 
+                <Paper
+                  elevation={3}
+                  sx={{
+                    p: 3,
                     borderRadius: 2,
                     mb: 4
                   }}
                 >
-                  <Typography 
-                    variant="h5" 
-                    component="h2" 
+                  <Typography
+                    variant="h5"
+                    component="h2"
                     fontWeight="600"
                     fontFamily="Poppins, sans-serif"
                     gutterBottom
                   >
                     Tax Calculation Results
                   </Typography>
-                  
+
                   {!taxResult ? (
                     <Box sx={{ textAlign: 'center', py: 4 }}>
                       <InfoIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
@@ -553,9 +553,9 @@ const CalculatorPage: React.FC = () => {
                     </Box>
                   ) : (
                     <Box>
-                      <Card 
-                        sx={{ 
-                          bgcolor: 'primary.main', 
+                      <Card
+                        sx={{
+                          bgcolor: 'primary.main',
                           color: 'white',
                           borderRadius: 2,
                           mb: 3
@@ -573,56 +573,56 @@ const CalculatorPage: React.FC = () => {
                           </Typography>
                         </CardContent>
                       </Card>
-                      
+
                       <Typography variant="subtitle1" fontWeight="600" gutterBottom>
                         Income Breakdown
                       </Typography>
-                      
+
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                         <Typography variant="body2">Total Income:</Typography>
                         <Typography variant="body2" fontWeight="500">₹{taxResult.totalIncome.toLocaleString('en-IN')}</Typography>
                       </Box>
-                      
+
                       {taxRegime === 'old' && (
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                           <Typography variant="body2">Total Deductions:</Typography>
                           <Typography variant="body2" fontWeight="500">₹{taxResult.totalDeductions.toLocaleString('en-IN')}</Typography>
                         </Box>
                       )}
-                      
+
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                         <Typography variant="body2">Taxable Income:</Typography>
                         <Typography variant="body2" fontWeight="500">₹{taxResult.taxableIncome.toLocaleString('en-IN')}</Typography>
                       </Box>
-                      
+
                       <Divider sx={{ my: 2 }} />
-                      
+
                       <Typography variant="subtitle1" fontWeight="600" gutterBottom>
                         Tax Breakdown
                       </Typography>
-                      
+
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                         <Typography variant="body2">Income Tax:</Typography>
                         <Typography variant="body2" fontWeight="500">₹{taxResult.incomeTax.toLocaleString('en-IN')}</Typography>
                       </Box>
-                      
+
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                         <Typography variant="body2">Surcharge:</Typography>
                         <Typography variant="body2" fontWeight="500">₹{taxResult.surcharge.toLocaleString('en-IN')}</Typography>
                       </Box>
-                      
+
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                         <Typography variant="body2">Health & Education Cess:</Typography>
                         <Typography variant="body2" fontWeight="500">₹{taxResult.cess.toLocaleString('en-IN')}</Typography>
                       </Box>
-                      
+
                       <Divider sx={{ my: 2 }} />
-                      
+
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                         <Typography variant="subtitle1" fontWeight="600">Total Tax Liability:</Typography>
                         <Typography variant="subtitle1" fontWeight="700" color="primary.main">₹{taxResult.totalTaxLiability.toLocaleString('en-IN')}</Typography>
                       </Box>
-                      
+
                       <Button
                         variant="outlined"
                         color="secondary"
@@ -636,53 +636,13 @@ const CalculatorPage: React.FC = () => {
                     </Box>
                   )}
                 </Paper>
-                
-                <Paper 
-                  elevation={3} 
-                  sx={{ 
-                    p: 3, 
-                    borderRadius: 2,
-                    bgcolor: 'secondary.light',
-                    color: 'white'
-                  }}
-                >
-                  <Typography 
-                    variant="h6" 
-                    component="h3" 
-                    fontWeight="600"
-                    fontFamily="Poppins, sans-serif"
-                    gutterBottom
-                  >
-                    Need Help?
-                  </Typography>
-                  
-                  <Typography variant="body2" paragraph>
-                    Upload your tax documents and let our AI extract information automatically.
-                  </Typography>
-                  
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{ 
-                      bgcolor: 'white',
-                      color: 'secondary.dark',
-                      '&:hover': {
-                        bgcolor: 'rgba(255,255,255,0.9)'
-                      },
-                      fontWeight: 600
-                    }}
-                    href="/upload"
-                  >
-                    Upload Documents
-                  </Button>
-                </Paper>
               </Box>
             </Grid>
           </Grid>
         </TabPanel>
-        
+
         <TabPanel value={tabValue} index={1}>
-          <TaxRegimeComparison 
+          <TaxRegimeComparison
             comparisonResult={comparisonResult}
             onCalculate={handleCompare}
           />

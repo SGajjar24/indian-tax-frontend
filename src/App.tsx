@@ -11,7 +11,6 @@ import Footer from './components/Footer';
 // Pages
 import HomePage from './pages/HomePage';
 import CalculatorPage from './pages/CalculatorPage';
-import UploadPage from './pages/UploadPage';
 import DeductionsPage from './pages/DeductionsPage';
 import PlanningPage from './pages/PlanningPage';
 import ReportsPage from './pages/ReportsPage';
@@ -26,7 +25,6 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/calculator" element={<CalculatorPage />} />
-          <Route path="/upload" element={<UploadPage />} />
           <Route path="/deductions" element={<DeductionsPage />} />
           <Route path="/planning" element={<PlanningPage />} />
           <Route path="/reports" element={<ReportsPage />} />
