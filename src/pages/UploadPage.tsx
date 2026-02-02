@@ -92,6 +92,7 @@ const UploadPage: React.FC = () => {
   });
 
   // Handle upload
+  // Handle upload
   const handleUpload = async () => {
     if (files.length === 0) {
       setUploadError('Please select files to upload');
@@ -100,9 +101,10 @@ const UploadPage: React.FC = () => {
 
     setUploading(true);
     setUploadError(null);
+    setProcessingError(null);
 
     try {
-      // Upload files to server
+      // Simulate upload to get standardized file objects
       const response = await documentService.uploadDocuments(files);
 
       if (response.success) {
@@ -110,22 +112,29 @@ const UploadPage: React.FC = () => {
         setUploadSuccess(true);
         setActiveStep(1); // Move to AI Processing step
 
-        // Process the first file
+        // Process the first file immediately
         if (response.files && response.files.length > 0) {
-          // Pass the actual File object for client-side processing
-          const fileToProcess = files[0];
-          await processDocument(fileToProcess);
+          // Small delay to let the UI transition to step 1 before starting heavy processing
+          setTimeout(() => {
+            const fileToProcess = files[0];
+            processDocument(fileToProcess);
+          }, 500);
         }
       } else {
         setUploadError('Upload failed: ' + response.message);
       }
     } catch (error: any) {
-      setUploadError('An error occurred during upload: ' + (error.message || 'Unknown error'));
+      console.error("Upload error:", error);
+      setUploadError('Upload failed: ' + (error.message || 'Unknown error'));
     } finally {
-      setUploading(false);
+      // Keep uploading true if we moved to next step immediately, handled by processDocument
+      if (activeStep !== 1) {
+        setUploading(false);
+      }
     }
   };
 
+  // Process document with Gemini AI
   // Process document with Gemini AI
   const processDocument = async (fileOrFilename: File | string) => {
     setProcessing(true);
@@ -134,43 +143,36 @@ const UploadPage: React.FC = () => {
     try {
       // Process document with AI
       const response = await documentService.processDocument(fileOrFilename);
+      console.log("Processing response:", response);
 
       if (response.success) {
         setExtractedData(response.data);
         setProcessingComplete(true);
         setActiveStep(2); // Move to Review & Edit step
       } else {
-        setProcessingError('Processing failed: ' + response.message);
+        throw new Error(response.message || 'Processing failed');
       }
     } catch (error: any) {
-      setProcessingError('An error occurred during AI processing: ' + (error.message || 'Unknown error'));
+      console.error("Processing error:", error);
 
-      // For demo purposes, use mock data if real API fails
-      const mockExtractedData = {
-        incomeDetails: {
-          salaryIncome: 1200000,
-          businessIncome: 0,
-          capitalGains: 50000,
-          housePropertyIncome: 180000,
-          otherIncome: 25000
-        },
-        deductionDetails: {
-          section80C: 120000,
-          section80D: 25000,
-          hra: 60000,
-          lta: 30000,
-          nps: 50000,
-          homeLoanInterest: 150000,
-          otherDeductions: 10000
-        },
-        taxRegime: 'old'
-      };
+      let errorMessage = error.message || 'Unknown error';
+      if (errorMessage.includes('413')) {
+        errorMessage = "File is too large. Please upload a smaller file (under 4MB).";
+      } else if (errorMessage.includes('timeout')) {
+        errorMessage = "Processing timed out. The AI is taking too long.";
+      }
 
-      setExtractedData(mockExtractedData);
-      setProcessingComplete(true);
-      setActiveStep(2); // Move to Review & Edit step
+      setProcessingError('AI Processing failed: ' + errorMessage);
+
+      // OPTIONAL: Fallback to mock data only if explicitly desired, otherwise show error
+      // user requested "proper error handling", so we should probably stop and show error
+      // but keeping fallback for demo continuity if it's just a network glitch could be nice.
+      // Let's decided to NOT auto-fallback to mock data on real error, to be transparent.
+      // But we can add a button to "Use Demo Data" in the error UI.
+
     } finally {
       setProcessing(false);
+      setUploading(false); // Ensure upload state is cleared
     }
   };
 
@@ -449,12 +451,44 @@ const UploadPage: React.FC = () => {
                 </Box>
 
                 {processingError && (
-                  <Alert severity="warning" sx={{ mt: 3, textAlign: 'left' }}>
-                    {processingError}
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      Using demo data for preview purposes.
+                  <Box sx={{ mt: 3, textAlign: 'left' }}>
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                      {processingError}
+                    </Alert>
+
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      If you are facing connection issues, you can try with our demo data:
                     </Typography>
-                  </Alert>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      onClick={() => {
+                        setProcessingError(null);
+                        setExtractedData({
+                          incomeDetails: { salaryIncome: 1500000, businessIncome: 0, capitalGains: 20000, housePropertyIncome: 0, otherIncome: 50000 },
+                          deductionDetails: { section80C: 150000, section80D: 25000, hra: 0, lta: 0, nps: 50000, homeLoanInterest: 0, otherDeductions: 0 },
+                          taxRegime: 'new'
+                        });
+                        setProcessingComplete(true);
+                        setActiveStep(2);
+                      }}
+                    >
+                      Use Demo Data
+                    </Button>
+                    <Button
+                      variant="contained"
+                      sx={{ ml: 2 }}
+                      size="small"
+                      onClick={() => {
+                        setActiveStep(0);
+                        setFiles([]);
+                        setProcessingError(null);
+                      }}
+                    >
+                      Try Again
+                    </Button>
+                  </Box>
                 )}
 
                 <Typography variant="body2" color="text.secondary">

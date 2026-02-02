@@ -19,15 +19,20 @@ module.exports = async (req, res) => {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    console.log('Document processing request received:', filename, mimeType);
+
     try {
         const { fileData, mimeType, filename } = req.body;
 
         if (!process.env.GEMINI_API_KEY) {
+            console.error('SERVER ERROR: GEMINI_API_KEY is missing in environment variables.');
             return res.status(500).json({ success: false, message: 'Server configuration error: API key missing' });
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        console.log('Sending request to Gemini AI...');
 
         let prompt = `
       Analyze this tax document (${filename}) and extract key financial details for Indian Income Tax calculation.
@@ -54,9 +59,6 @@ module.exports = async (req, res) => {
       If a value is not found, use 0. infer tax regime from context if possible, default to 'old'.
     `;
 
-        // For now, we only support text or basic parsing if it's not an image/pdf supported by standard gemini text model
-        // However, Gemini 1.5 Flash supports images and PDFs directly via inline data
-
         const parts = [
             { text: prompt }
         ];
@@ -74,14 +76,26 @@ module.exports = async (req, res) => {
         const response = await result.response;
         const text = response.text();
 
+        console.log('Gemini AI response received. Length:', text.length);
+
         // Clean up potential markdown code blocks
         const cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        const data = JSON.parse(cleanedText);
 
-        res.status(200).json({ success: true, data });
+        try {
+            const data = JSON.parse(cleanedText);
+            console.log('Successfully parsed Gemini response.');
+            return res.status(200).json({ success: true, data });
+        } catch (parseError) {
+            console.error('Failed to parse Gemini response:', cleanedText);
+            return res.status(500).json({
+                success: false,
+                message: 'AI returned invalid data format',
+                rawResponse: text // Optional: Return raw text for debugging
+            });
+        }
 
     } catch (error) {
-        console.error('Gemini API Error:', error);
+        console.error('Gemini API/Processing Error:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to process document',

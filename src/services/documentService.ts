@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+// Configure axios timeout (60 seconds for AI processing)
+const axiosInstance = axios.create({
+  timeout: 60000
+});
+
 const API_URL = 'http://localhost:5000/api';
 
 /**
@@ -54,8 +59,15 @@ export const documentService = {
         reader.onerror = error => reject(error);
       });
 
+      // Validate file size (Vercel serverless function payload limit is 4.5MB)
+      // We limit to 4MB to be safe with Base64 overhead
+      if (file.size > 4 * 1024 * 1024) {
+        throw new Error('File size exceeds the 4MB limit for this free calculator. Please compress your PDF or Image.');
+      }
+
       // Call serverless function
-      const response = await axios.post('/api/process-document', {
+      console.log('Sending file to server...', file.name);
+      const response = await axiosInstance.post('/api/process-document', {
         fileData: base64Data,
         mimeType: file.type,
         filename: file.name
