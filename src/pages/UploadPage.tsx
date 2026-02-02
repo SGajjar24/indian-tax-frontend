@@ -156,6 +156,18 @@ const UploadPage: React.FC = () => {
       console.error("Processing error:", error);
 
       let errorMessage = error.message || 'Unknown error';
+
+      // Extract detailed server error if available
+      if (error.response && error.response.data) {
+        const serverError = error.response.data;
+        if (serverError.message) {
+          errorMessage = serverError.message;
+        }
+        if (serverError.error) {
+          errorMessage += `: ${serverError.error}`;
+        }
+      }
+
       if (errorMessage.includes('413')) {
         errorMessage = "File is too large. Please upload a smaller file (under 4MB).";
       } else if (errorMessage.includes('timeout')) {
