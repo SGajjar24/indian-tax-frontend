@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
 
     try {
         const { fileData, mimeType, filename } = req.body;
-        
+
         console.log('Document processing request received:', filename, mimeType);
 
         if (!process.env.GEMINI_API_KEY) {
@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
         console.log('Sending request to Gemini AI...');
 
