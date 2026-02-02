@@ -164,7 +164,10 @@ const UploadPage: React.FC = () => {
           errorMessage = serverError.message;
         }
         if (serverError.error) {
-          errorMessage += `: ${serverError.error}`;
+          const detailedError = typeof serverError.error === 'object'
+            ? JSON.stringify(serverError.error)
+            : serverError.error;
+          errorMessage += `: ${detailedError}`;
         }
       }
 
