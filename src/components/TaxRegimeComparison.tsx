@@ -1,29 +1,81 @@
 import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
+import {
+  Box,
+  Typography,
+  Paper,
   Grid,
   Divider,
+  Button,
   useTheme
 } from '@mui/material';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-interface TaxRegimeComparisonProps {
+interface ComparisonResult {
   oldRegimeTax: number;
   newRegimeTax: number;
   savings: number;
   betterRegime: 'old' | 'new';
 }
 
-const TaxRegimeComparison: React.FC<TaxRegimeComparisonProps> = ({ 
-  oldRegimeTax, 
-  newRegimeTax, 
-  savings,
-  betterRegime
+interface TaxRegimeComparisonProps {
+  comparisonResult: ComparisonResult | null;
+  onCalculate: () => void;
+}
+
+const TaxRegimeComparison: React.FC<TaxRegimeComparisonProps> = ({
+  comparisonResult,
+  onCalculate
 }) => {
   const theme = useTheme();
-  
+
+  // Show placeholder if no comparison result
+  if (!comparisonResult) {
+    return (
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          borderRadius: 2,
+          mb: 4,
+          textAlign: 'center'
+        }}
+      >
+        <CompareArrowsIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+        <Typography
+          variant="h5"
+          component="h2"
+          fontWeight="600"
+          fontFamily="Poppins, sans-serif"
+          gutterBottom
+        >
+          Tax Regime Comparison
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          Fill in your income details in the Tax Calculator tab first, then click "Compare Regimes" to see which tax regime is better for you.
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          startIcon={<CompareArrowsIcon />}
+          onClick={onCalculate}
+          sx={{
+            py: 1.5,
+            px: 4,
+            fontWeight: 600,
+            borderRadius: 2,
+            mt: 2
+          }}
+        >
+          Compare Tax Regimes
+        </Button>
+      </Paper>
+    );
+  }
+
+  const { oldRegimeTax, newRegimeTax, savings, betterRegime } = comparisonResult;
+
   const chartData = [
     {
       name: 'Old Regime',
@@ -36,30 +88,30 @@ const TaxRegimeComparison: React.FC<TaxRegimeComparisonProps> = ({
       fill: theme.palette.secondary.main
     }
   ];
-  
+
   return (
-    <Paper 
-      elevation={3} 
-      sx={{ 
-        p: 3, 
+    <Paper
+      elevation={3}
+      sx={{
+        p: 3,
         borderRadius: 2,
         mb: 4
       }}
     >
-      <Typography 
-        variant="h5" 
-        component="h2" 
+      <Typography
+        variant="h5"
+        component="h2"
         fontWeight="600"
         fontFamily="Poppins, sans-serif"
         gutterBottom
       >
         Tax Regime Comparison
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" paragraph>
         Compare your tax liability under both regimes to choose the most beneficial option for you.
       </Typography>
-      
+
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Box sx={{ height: 300 }}>
@@ -71,11 +123,11 @@ const TaxRegimeComparison: React.FC<TaxRegimeComparisonProps> = ({
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Tax Amount']}
-                  contentStyle={{ 
-                    borderRadius: 8, 
-                    border: 'none', 
+                  contentStyle={{
+                    borderRadius: 8,
+                    border: 'none',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                     fontFamily: 'Roboto, sans-serif'
                   }}
@@ -86,7 +138,7 @@ const TaxRegimeComparison: React.FC<TaxRegimeComparisonProps> = ({
             </ResponsiveContainer>
           </Box>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <Box sx={{ p: 2, bgcolor: 'grey.100', borderRadius: 2, mb: 2 }}>
             <Typography variant="body1" fontWeight="500">
@@ -96,7 +148,7 @@ const TaxRegimeComparison: React.FC<TaxRegimeComparisonProps> = ({
               ₹{oldRegimeTax.toLocaleString('en-IN')}
             </Typography>
           </Box>
-          
+
           <Box sx={{ p: 2, bgcolor: 'grey.100', borderRadius: 2, mb: 2 }}>
             <Typography variant="body1" fontWeight="500">
               New Regime Tax:
@@ -105,12 +157,12 @@ const TaxRegimeComparison: React.FC<TaxRegimeComparisonProps> = ({
               ₹{newRegimeTax.toLocaleString('en-IN')}
             </Typography>
           </Box>
-          
+
           <Divider sx={{ my: 2 }} />
-          
-          <Box sx={{ 
-            p: 3, 
-            bgcolor: betterRegime === 'old' ? 'primary.light' : 'secondary.light', 
+
+          <Box sx={{
+            p: 3,
+            bgcolor: betterRegime === 'old' ? 'primary.light' : 'secondary.light',
             color: 'white',
             borderRadius: 2
           }}>
@@ -124,6 +176,17 @@ const TaxRegimeComparison: React.FC<TaxRegimeComparisonProps> = ({
               by choosing the <strong>{betterRegime === 'old' ? 'Old' : 'New'} Tax Regime</strong>
             </Typography>
           </Box>
+
+          <Button
+            variant="outlined"
+            color="primary"
+            fullWidth
+            startIcon={<CompareArrowsIcon />}
+            onClick={onCalculate}
+            sx={{ mt: 3 }}
+          >
+            Recalculate Comparison
+          </Button>
         </Grid>
       </Grid>
     </Paper>
