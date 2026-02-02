@@ -19,10 +19,10 @@ module.exports = async (req, res) => {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    console.log('Document processing request received:', filename, mimeType);
-
     try {
         const { fileData, mimeType, filename } = req.body;
+        
+        console.log('Document processing request received:', filename, mimeType);
 
         if (!process.env.GEMINI_API_KEY) {
             console.error('SERVER ERROR: GEMINI_API_KEY is missing in environment variables.');
